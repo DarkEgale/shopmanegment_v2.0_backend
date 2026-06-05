@@ -10,5 +10,6 @@ router.post("/", validate(validation.createSaleSchema), controller.createSale);
 router.get("/unpaid", validate(validation.unpaidQuerySchema), controller.listUnpaidSales);
 router.get("/unpaid/customers", validate(validation.unpaidQuerySchema), controller.getUnpaidCustomerSummary);
 router.get("/:id", validate(validation.idParamSchema), controller.getSale);
+router.put("/:id", validate(validation.updateSaleSchema), controller.updateSale);
 
 module.exports = router;

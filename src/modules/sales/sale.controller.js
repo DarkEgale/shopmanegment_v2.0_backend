@@ -7,6 +7,11 @@ const createSale = asyncHandler(async (req, res) => {
   sendResponse(res, 201, "Sale completed", result);
 });
 
+const updateSale = asyncHandler(async (req, res) => {
+  const result = await service.updateSale(req.user, req.validated.params.id, req.validated.body);
+  sendResponse(res, 200, "Sale updated", result);
+});
+
 const listSales = asyncHandler(async (req, res) => {
   const result = await service.listSales(req.user.id, req.validated.query);
   sendResponse(res, 200, "Sales loaded", { sales: result.items }, result.meta);
@@ -27,4 +32,4 @@ const getUnpaidCustomerSummary = asyncHandler(async (req, res) => {
   sendResponse(res, 200, "Unpaid customers loaded", { customers });
 });
 
-module.exports = { createSale, listSales, getSale, listUnpaidSales, getUnpaidCustomerSummary };
+module.exports = { createSale, updateSale, listSales, getSale, listUnpaidSales, getUnpaidCustomerSummary };

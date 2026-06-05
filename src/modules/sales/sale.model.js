@@ -4,6 +4,7 @@ const saleSchema = new mongoose.Schema(
   {
     invoiceNumber: { type: String, required: true, unique: true, index: true },
     customerName: { type: String, trim: true, default: "Walk-in Customer" },
+    customerPhone: { type: String, trim: true, default: "" },
     totalAmount: { type: Number, required: true, min: 0 },
     paidAmount: { type: Number, required: true, min: 0, default: 0 },
     dueAmount: { type: Number, required: true, min: 0, default: 0, index: true },
@@ -32,5 +33,6 @@ saleSchema.index({ userId: 1, createdAt: -1 });
 saleSchema.index({ userId: 1, dueAmount: 1, createdAt: -1 });
 saleSchema.index({ userId: 1, paymentStatus: 1, createdAt: -1 });
 saleSchema.index({ userId: 1, customerName: 1 });
+saleSchema.index({ userId: 1, customerName: 1, customerPhone: 1 });
 
 module.exports = mongoose.model("Sale", saleSchema);

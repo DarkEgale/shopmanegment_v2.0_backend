@@ -3,6 +3,7 @@ const { z } = require("zod");
 const createSaleSchema = z.object({
   body: z.object({
     customerName: z.string().optional(),
+    customerPhone: z.string().optional(),
     discount: z.coerce.number().min(0).optional(),
     paidAmount: z.coerce.number().min(0).optional(),
     paymentStatus: z.enum(["paid", "partial", "unpaid"]).optional(),
@@ -40,4 +41,4 @@ const unpaidQuerySchema = z.object({
 
 const idParamSchema = z.object({ params: z.object({ id: z.string().min(1) }) });
 
-module.exports = { createSaleSchema, listSaleSchema, unpaidQuerySchema, idParamSchema };
+module.exports = { createSaleSchema, updateSaleSchema: createSaleSchema.merge(idParamSchema), listSaleSchema, unpaidQuerySchema, idParamSchema };

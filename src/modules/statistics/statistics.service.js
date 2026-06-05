@@ -10,11 +10,13 @@ const groupSalesByDate = (userId, format, startDate = null) => {
   if (startDate) match.createdAt = { $gte: startDate };
   return Sale.aggregate([
     { $match: match },
+    { $lookup: { from: "saleitems", localField: "_id", foreignField: "saleId", as: "items" } },
+    { $addFields: { grossProfit: { $sum: "$items.profit" } } },
     {
       $group: {
         _id: { $dateToString: { format, date: "$createdAt" } },
         sales: { $sum: "$totalAmount" },
-        profit: { $sum: "$totalProfit" },
+        profit: { $sum: { $subtract: ["$grossProfit", { $ifNull: ["$discount", 0] }] } },
         orders: { $sum: 1 },
       },
     },
@@ -66,7 +68,19 @@ const getStatistics = async (userId) => {
       .sort("quantity")
       .limit(10),
     Product.find({ userId, isDeleted: false, quantity: 0 }).sort("-updatedAt").limit(10),
-    Sale.aggregate([{ $match: { userId: uid } }, { $group: { _id: null, actualSalesProfit: { $sum: "$totalProfit" }, revenue: { $sum: "$totalAmount" }, orders: { $sum: 1 } } }]),
+    Sale.aggregate([
+      { $match: { userId: uid } },
+      { $lookup: { from: "saleitems", localField: "_id", foreignField: "saleId", as: "items" } },
+      { $addFields: { grossProfit: { $sum: "$items.profit" } } },
+      {
+        $group: {
+          _id: null,
+          actualSalesProfit: { $sum: { $subtract: ["$grossProfit", { $ifNull: ["$discount", 0] }] } },
+          revenue: { $sum: "$totalAmount" },
+          orders: { $sum: 1 },
+        },
+      },
+    ]),
     SaleItem.aggregate([
       { $match: { userId: uid } },
       { $group: { _id: { productId: "$productId", name: "$productName", sku: "$productSku" }, quantity: { $sum: "$quantity" }, revenue: { $sum: "$subtotal" }, profit: { $sum: "$profit" } } },
